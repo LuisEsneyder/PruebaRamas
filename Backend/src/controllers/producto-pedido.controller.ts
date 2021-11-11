@@ -55,7 +55,6 @@ export class ProductoPedidoController {
   })
   async create(
     @param.path.string('id') id: typeof Producto.prototype.id,
-    
     @requestBody({
       content: {
         'application/json': {
@@ -68,8 +67,10 @@ export class ProductoPedidoController {
       },
     }) pedido: Omit<Pedido, 'id'>,
   ): Promise<Pedido> {
+    let ProductoEncontrado = await this.productoRepository.findById(id);
+    pedido.total= pedido.cantidad * ProductoEncontrado.precio;
     let pedidoguardado =await this.productoRepository.pedido(id).create(pedido);
-    
+    await this.productoRepository.updateById(id, {pedidoId : pedidoguardado.id}) ;
     return pedidoguardado;
   }
 

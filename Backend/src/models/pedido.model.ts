@@ -16,7 +16,11 @@ export class Pedido extends Entity {
     required: false,
   })
   total: number;
-
+  @property({
+    type: 'number',
+    required: false,
+  })
+  cantidad : number;
   @belongsTo(() => Usuario)
   usuarioId: string;
 
