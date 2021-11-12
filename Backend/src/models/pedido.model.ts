@@ -37,7 +37,6 @@ export class Pedido extends Entity {
   }
 }
 
-
 export interface PedidoRelations {
   // describe navigational properties here
 }
