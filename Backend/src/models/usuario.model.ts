@@ -28,6 +28,11 @@ export class Usuario extends Entity {
     required: true,
   })
   contrasena: string;
+  @property({
+    type: 'string',
+    required: true,
+  })
+  Telefono: string;
 
   @hasMany(() => Pedido)
   pedidos: Pedido[];
