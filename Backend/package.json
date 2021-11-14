@@ -1,7 +1,7 @@
 {
   "name": "eco-sastreria",
   "version": "0.0.1",
-  "description": "EcoSastreria",
+  "description": "PruebaRamas",
   "keywords": [
     "loopback-application",
     "loopback"
@@ -55,7 +55,6 @@
     "@loopback/rest": "^10.1.0",
     "@loopback/rest-explorer": "^3.3.4",
     "@loopback/service-proxy": "^3.2.4",
-    "loopback-connector-mongodb": "^5.6.0",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
