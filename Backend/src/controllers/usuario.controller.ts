@@ -1,3 +1,4 @@
+import { service } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -17,13 +18,21 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {Usuario} from '../models';
-import {UsuarioRepository} from '../repositories';
+import {Rol, Usuario} from '../models';
+import {RolRepository, UsuarioRepository} from '../repositories';
+import { AutenticacionService } from '../services';
+import {llaves} from '../config/llaves'
+import { promises } from 'dns';
+const fetch = require('node-fetch');
 
 export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
     public usuarioRepository : UsuarioRepository,
+    @repository(RolRepository)
+    public rolRepositorio : RolRepository,
+    @service(AutenticacionService)
+    public servicioAutentificacion : AutenticacionService
   ) {}
 
   @post('/usuarios')
@@ -44,7 +53,29 @@ export class UsuarioController {
     })
     usuario: Omit<Usuario, 'id'>,
   ): Promise<Usuario> {
-    return this.usuarioRepository.create(usuario);
+    //asignar contraseña
+    let clave = this.servicioAutentificacion.generarClave();
+    let claceCifrada = this.servicioAutentificacion.cifradoClave(clave);
+    usuario.contrasena = claceCifrada;
+    //Esta ruta solo tendra el rol de cliente
+    let rol = await this.rolRepositorio.findOne({where: {nombre : 'cliente'}});
+    if(rol){
+      usuario.rolId = `${rol.id}`
+    }else{
+      let nuevoRol= await this.rolRepositorio.create({nombre: 'cliente'})
+      usuario.rolId = `${nuevoRol.id}`
+    }
+    let Usr= await this.usuarioRepository.create(usuario); 
+    //Notificación Usuario
+    let destino = usuario.correo;
+    let asunto = 'Registro Eco-Sastreria';
+    let contenido = `Hola ${usuario.nombre}, su usuario es: ${usuario.correo}, su contraseña es: ${clave} y su rol es: ${usuario.rolId}.
+    Bienvenido a eco-satreria`
+    fetch(`${llaves.urlServiciosNotificaciones}/envio-correo?destino=${destino}&asunto=${asunto}&contenido=${contenido}`).then((data:any)=>{
+      console.log(data);
+    });
+    return usuario;
+    
   }
 
   @get('/usuarios/count')
